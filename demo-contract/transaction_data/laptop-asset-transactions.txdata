@@ -1,0 +1,44 @@
+[
+    {
+        "transactionName": "laptopAssetExists",
+        "transactionLabel": "A test laptopAssetExists transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "createLaptopAsset",
+        "transactionLabel": "A test createLaptopAsset transaction",
+        "arguments": [
+            "001",
+            "some value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "readLaptopAsset",
+        "transactionLabel": "A test readLaptopAsset transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "updateLaptopAsset",
+        "transactionLabel": "A test updateLaptopAsset transaction",
+        "arguments": [
+            "001",
+            "some other value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "deleteLaptopAsset",
+        "transactionLabel": "A test deleteLaptopAsset transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    }
+]
