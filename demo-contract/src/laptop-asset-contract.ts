@@ -16,10 +16,14 @@ export class LaptopAssetContract extends Contract {
     }
 
     @Transaction()
-    public async createLaptopAsset(ctx: Context, laptopAssetId: string, value: string): Promise<void> {
+    public async createLaptopAsset(ctx: Context, laptopAssetId: string, value: string, maker: string, model: string, year: number): Promise<void> {
         const exists: boolean = await this.laptopAssetExists(ctx, laptopAssetId);
         if (exists) {
             throw new Error(`The laptop asset ${laptopAssetId} already exists`);
+        }
+        const hasAccess = await this.hasRole(ctx, ['Manufacturer']);
+        if (!hasAccess) {
+            throw new Error(`Only manufacturer can create car asset`);
         }
         const laptopAsset: LaptopAsset = new LaptopAsset();
         laptopAsset.value = value;
@@ -42,10 +46,14 @@ export class LaptopAssetContract extends Contract {
     }
 
     @Transaction()
-    public async updateLaptopAsset(ctx: Context, laptopAssetId: string, newValue: string): Promise<void> {
+    public async updateLaptopAsset(ctx: Context, laptopAssetId: string, newValue: string, maker: string, model: string, year: number): Promise<void> {
         const exists: boolean = await this.laptopAssetExists(ctx, laptopAssetId);
         if (!exists) {
             throw new Error(`The laptop asset ${laptopAssetId} does not exist`);
+        }
+        const hasAccess = await this.hasRole(ctx, ['Manufacturer', 'Dealer']);
+        if (!hasAccess) {
+            throw new Error(`Only manufacturer or dealer can update car asset`);
         }
         const laptopAsset: LaptopAsset = new LaptopAsset();
         laptopAsset.value = newValue;
@@ -58,6 +66,10 @@ export class LaptopAssetContract extends Contract {
         const exists: boolean = await this.laptopAssetExists(ctx, laptopAssetId);
         if (!exists) {
             throw new Error(`The laptop asset ${laptopAssetId} does not exist`);
+        }
+        const hasAccess = await this.hasRole(ctx, ['Dealer']);
+        if (!hasAccess) {
+            throw new Error(`Only dealer can delete car asset`);
         }
         await ctx.stub.deleteState(laptopAssetId);
     }
@@ -91,5 +103,17 @@ export class LaptopAssetContract extends Contract {
             }
         }
     }
-
+    
+    public async hasRole(ctx: Context, roles: string[]) {
+        const clientID = ctx.clientIdentity;
+        for (const roleName of roles) {
+            if (clientID.assertAttributeValue('role', roleName)) {
+                if (clientID.getMSPID() === 'Org1MSP' && clientID.getAttributeValue('role') === 'Manufacturer') { return true; }
+                if (clientID.getMSPID() === 'Org2MSP' && clientID.getAttributeValue('role') === 'Dealer') { return true; }
+            }
+        }
+        return false;
+    }
 }
+
+
